@@ -33,12 +33,12 @@ def find_indentation(line, config):
     if config['from'] >= 0:
         # Set old indent
         indent = " " if not config['is-tabs'] else "\t"
-        indent = indent * config['from']
+        indent *= config['from']
 
         # Set new indent
         newindent = " " if not config['tabs'] else "\t"
         if not config['tabs']:
-            newindent = newindent * config['to']
+            newindent *= config['to']
 
         return indent, newindent
 
@@ -97,7 +97,7 @@ def run_files(filenames, config):
     for filename in filenames:
         with codecs.open(filename, encoding=config['encoding']) as fd_in:
             if config['dry-run']:
-                print("Filename: %s" % filename)
+                print(f"Filename: {filename}")
                 fd_out = sys.stdout
             else:
                 fd_out = tempfile.NamedTemporaryFile(mode='wb', delete=False)

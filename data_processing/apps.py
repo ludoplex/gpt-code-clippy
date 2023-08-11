@@ -192,21 +192,16 @@ def generate_prompt(
     Generate a prompt for a given test case.
     Original version from https://github.com/hendrycks/apps/blob/main/eval/generate_gpt_codes.py#L51.
     """
-    _input = "\nQUESTION:\n"
     with open(prompt_path, "r") as f:
         data = f.readlines()
         data = "".join(data)
-    _input += data
+    _input = "\nQUESTION:\n" + data
     if starter_path != None:
         with open(starter_path, "r") as f:
             data = f.readlines()
             data = "".join(data)
             data = "\n" + data  # + "\n"
         _input += data
-    else:
-        # _input += "\n\n"
-        pass
-
     with open(test_case_path, "r") as f:
         data = json.load(f)
     if not data.get("fn_name"):
@@ -268,12 +263,12 @@ def find_indentation(line, config):
     if config['from'] >= 0:
         # Set old indent
         indent = " " if not config['is-tabs'] else "\t"
-        indent = indent * config['from']
+        indent *= config['from']
 
         # Set new indent
         newindent = " " if not config['tabs'] else "\t"
         if not config['tabs']:
-            newindent = newindent * config['to']
+            newindent *= config['to']
 
         return indent, newindent
 

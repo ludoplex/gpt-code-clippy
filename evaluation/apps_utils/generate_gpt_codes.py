@@ -75,21 +75,16 @@ def reindent_code(codestr):
 def generate_prompt(
     test_case_path, prompt_path, solutions_path, tokenizer, starter_path=None
 ):
-    _input = "\nQUESTION:\n"
     with open(prompt_path, "r") as f:
         data = f.readlines()
         data = "".join(data)
-    _input += data
+    _input = "\nQUESTION:\n" + data
     if starter_path != None:
         with open(starter_path, "r") as f:
             data = f.readlines()
             data = "".join(data)
             data = "\n" + data  # + "\n"
         _input += data
-    else:
-        # _input += "\n\n"
-        pass
-
     with open(test_case_path, "r") as f:
         data = json.load(f)
     if not data.get("fn_name"):

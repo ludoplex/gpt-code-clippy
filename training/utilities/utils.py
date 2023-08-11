@@ -45,12 +45,11 @@ class PrefetchDataloaderTread(threading.Thread):
             self.ds_iter = iter(self.dataset)
 
     def __next__(self):
-        batch = self.queue.get()
-        return batch
+        return self.queue.get()
         
     def run(self):
         i = 0
-        while True and i < self.max_steps:
+        while i < self.max_steps:
             i += 1
             # prepair next batch
             sample = self.rem.copy()
@@ -63,15 +62,15 @@ class PrefetchDataloaderTread(threading.Thread):
                     # reset generator if a pass through dataset is completed
                     self.make_iter()
                     next_sample = next(self.ds_iter)
-                    
+
                 l += len(next_sample["input_ids"])
                 sample = {k:sample[k]+next_sample[k] for k in next_sample.keys()}
-            
+
             self.rem = {k:v[max_length:] for k,v in sample.items()}
             sample = {k:v[:max_length] for k,v in sample.items()}
             # regroup to shape [bs x seq_len]
             samples = {k:np.array([v[i*self.seq_len:(i+1)*self.seq_len] for i in range(self.bs)]) for k,v in sample.items()}
-            
+
             self.queue.put(make_batch(samples))
         self.queue.put(None)
     
@@ -110,7 +109,7 @@ class PrefetchDataloader(multiprocessing.Process):
         
     def run(self):
         i = 0
-        while True and i < self.max_steps:
+        while i < self.max_steps:
             # prepair next batch
             sample = self.rem.copy()
             l = len(sample["input_ids"])
@@ -125,12 +124,12 @@ class PrefetchDataloader(multiprocessing.Process):
 
                 l += len(next_sample["input_ids"])
                 sample = {k:sample[k]+next_sample[k] for k in next_sample.keys()}
-            
+
             self.rem = {k:v[max_length:] for k,v in sample.items()}
             sample = {k:v[:max_length] for k,v in sample.items()}
             # regroup to shape [bs x seq_len]
             samples = {k:np.array([v[i*self.seq_len:(i+1)*self.seq_len] for i in range(self.bs)]) for k,v in sample.items()}
-            
+
             self.queue.put(samples)
         self.queue.put(None)
     

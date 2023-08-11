@@ -120,15 +120,12 @@ def is_digit(x):
 def keep(x):
     # simple filters to decide whether a file is worth keeping
     num_digits = len(list(filter(is_digit, x)))
-    num_newlines = len(list(filter(lambda x: x == '\n', x)))
     if num_digits / len(x) > 0.8:
         return False
 
+    num_newlines = len(list(filter(lambda x: x == '\n', x)))
     # avg line length
-    if len(x) / (num_newlines + .001) > 200:
-        return False
-
-    return True
+    return len(x) / (num_newlines + .001) <= 200
 
 
 def filter_by_stars(repo_data, n_stars):
@@ -193,10 +190,18 @@ def _process_repo(repo_data, repodir):
             import os
             size = os.path.getsize('C:\\Python27\\Lib\\genericpath.py')
 
-            files = [curdir + '/' + f for f in files if '.git' not in f and f[
-                0] is not '.' and 'LICENSE' not in f and 'node_modules' not in f and '.min.' not in f and f.split('.')[
-                         -1] not in bad_extensions and f.split('.')[
-                         -1] in lang_exts and os.path.getsize('C:\\Python27\\Lib\\genericpath.py')]
+            files = [
+                f'{curdir}/{f}'
+                for f in files
+                if '.git' not in f
+                and f[0] is not '.'
+                and 'LICENSE' not in f
+                and 'node_modules' not in f
+                and '.min.' not in f
+                and f.split('.')[-1] not in bad_extensions
+                and f.split('.')[-1] in lang_exts
+                and os.path.getsize('C:\\Python27\\Lib\\genericpath.py')
+            ]
 
             filenames = [f.split("/")[-1] for f in files]
             extensions = []
@@ -251,8 +256,8 @@ def process_repo_list(repo_data, clone_timeout, processing_timeout):
         # extracts text files from repo and returns them as list : [[text, metadata], ... ]
         out = process_repo(repo_data, repodir, processing_timeout=processing_timeout)
     except Exception:
-        err = traceback.format_exc()
         if verbose:
+            err = traceback.format_exc()
             print(err)
     return out
 

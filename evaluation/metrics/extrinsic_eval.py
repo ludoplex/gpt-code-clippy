@@ -16,8 +16,9 @@ def compute_metrics(references, generated, lang) -> dict:
     returns:
         A dicitonary with different metrics intact.
     """
-    metrics_dict = {}  # Update as in new metrics are added over here.
-    metrics_dict["smoothed_bleu_4"] = compute_bleu(references, generated, smooth=True)
+    metrics_dict = {
+        "smoothed_bleu_4": compute_bleu(references, generated, smooth=True)
+    }
     metrics_dict["bleu_4"] = compute_bleu(references, generated, smooth=False)
     metrics_dict["parse_score"] = Parser(generated, lang)["parse_score"]
     return metrics_dict

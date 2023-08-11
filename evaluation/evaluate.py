@@ -88,15 +88,16 @@ def _eval_human_eval(path, out_path, tokenizer, model):
     num_samples_per_task = 10
     samples = []
     for task_id in tqdm(list(problems.keys())):
-        for text in generate_text(
-            problems[task_id]["prompt"],
-            num_samples_per_task,
-            tokenizer,
-            model,
-            include_prompt=False,
-        ):
-            samples.append(dict(task_id=task_id, completion=text))
-
+        samples.extend(
+            dict(task_id=task_id, completion=text)
+            for text in generate_text(
+                problems[task_id]["prompt"],
+                num_samples_per_task,
+                tokenizer,
+                model,
+                include_prompt=False,
+            )
+        )
     write_jsonl(str(out_path / "human_eval.jsonl"), samples)
 
     # test out generated functions
