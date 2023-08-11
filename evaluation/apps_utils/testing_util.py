@@ -65,17 +65,13 @@ def parse_args():
     parser.add_argument("-n", "--number",  type=int, default=0,
             help="which problem to query.")
 
-    args = parser.parse_args()
-    return args
+    return parser.parse_args()
 
 
 def get_valid_problems(data_dir="leetcode"):
     # these are unnecessary atm
     if data_dir == "leetcode":
         root = os.path.join(args.source, "data")
-    elif data_dir == "atcoder":
-        pass
-
     root = os.path.join(data_dir, "data")
     if os.path.exists(os.path.join(data_dir, "valid_problems.json")):
         with open(os.path.join(data_dir, "valid_problems.json"), "r") as f:
@@ -91,10 +87,7 @@ def get_valid_problems(data_dir="leetcode"):
         #TODO add more validity checks
         if "input_output.json" in files or "sols.json" in files:
             valid_probs.append(prob_path)
-    valid_probs = sorted(valid_probs)
-    #with open(os.path.join(args.source,"valid_problems.json"), "w") as f:
-    #    json.dump(valid_probs, f)
-    return valid_probs
+    return sorted(valid_probs)
 
 
 def get_question(problem_list, prob_index):

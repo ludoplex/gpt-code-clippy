@@ -88,13 +88,12 @@ def compute_bleu(reference_corpus, translation_corpus, max_order=4, smooth=True)
             precisions[i] = (matches_by_order[i] + 1.0) / (
                 possible_matches_by_order[i] + 1.0
             )
+        elif possible_matches_by_order[i] > 0:
+            precisions[i] = (
+                float(matches_by_order[i]) / possible_matches_by_order[i]
+            )
         else:
-            if possible_matches_by_order[i] > 0:
-                precisions[i] = (
-                    float(matches_by_order[i]) / possible_matches_by_order[i]
-                )
-            else:
-                precisions[i] = 0.0
+            precisions[i] = 0.0
 
     if min(precisions) > 0:
         p_log_sum = sum((1.0 / max_order) * math.log(p) for p in precisions)
@@ -104,12 +103,9 @@ def compute_bleu(reference_corpus, translation_corpus, max_order=4, smooth=True)
 
     ratio = float(translation_length) / reference_length
 
-    if ratio > 1.0:
-        bp = 1.0
-    else:
-        bp = math.exp(1 - 1.0 / ratio)
+    bp = 1.0 if ratio > 1.0 else math.exp(1 - 1.0 / ratio)
     bleu = geo_mean * bp
-    bleu_score_dict = {
+    return {
         "bleu": bleu,
         "precision": precisions,
         "bp": bp,
@@ -117,15 +113,13 @@ def compute_bleu(reference_corpus, translation_corpus, max_order=4, smooth=True)
         "trans_len": translation_length,
         "ref_len": reference_length,
     }
-    return bleu_score_dict  # (bleu, precisions, bp, ratio, translation_length, reference_length)
 
 
 def bleu_test_case():
     """A simple functionality test case to evaluate BLEU"""
     generated = [[["a", "=", "b", "\n", "y", "=", "a", "+", "1"]]]
     reference = [["a", "=", "b", "\n", "print", "a"]]
-    score_dict = compute_bleu(generated, reference, smooth=False)
-    return score_dict
+    return compute_bleu(generated, reference, smooth=False)
 
 
 if __name__ == "__main__":

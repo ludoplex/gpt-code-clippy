@@ -16,8 +16,7 @@ dataset = datasets.load_dataset(
 
 
 def get_variables(example):
-    variables = " ".join(re.split(r"\W+", example["text"]))
-    return variables
+    return " ".join(re.split(r"\W+", example["text"]))
 
 
 def get_hash(example):

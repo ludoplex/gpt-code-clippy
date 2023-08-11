@@ -123,15 +123,12 @@ def is_digit(x):
 def keep(x):
     # simple filters to decide whether a file is worth keeping
     num_digits = len(list(filter(is_digit, x)))
-    num_newlines = len(list(filter(lambda x: x == '\n', x)))
     if num_digits / len(x) > 0.8:
         return False
 
+    num_newlines = len(list(filter(lambda x: x == '\n', x)))
     # avg line length
-    if len(x) / (num_newlines + .001) > 200:
-        return False
-
-    return True
+    return len(x) / (num_newlines + .001) <= 200
 
 
 def filter_by_stars(repo_data, n_stars):
@@ -270,8 +267,8 @@ def process_repo_list(repo_data, clone_timeout, processing_timeout):
         # extracts text files from repo and returns them as list : [[text, metadata], ... ]
         out = process_repo(repo_data, repodir, processing_timeout=processing_timeout)
     except Exception:
-        err = traceback.format_exc()
         if verbose:
+            err = traceback.format_exc()
             print(err)
     return out
 

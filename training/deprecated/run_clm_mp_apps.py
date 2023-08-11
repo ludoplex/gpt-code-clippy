@@ -160,13 +160,12 @@ class DataTrainingArguments:
     def __post_init__(self):
         if self.dataset_name is None and self.train_file is None and self.validation_file is None:
             raise ValueError("Need either a dataset name or a training/validation file.")
-        else:
-            if self.train_file is not None:
-                extension = self.train_file.split(".")[-1]
-                assert extension in ["csv", "json", "txt"], "`train_file` should be a csv, a json or a txt file."
-            if self.validation_file is not None:
-                extension = self.validation_file.split(".")[-1]
-                assert extension in ["csv", "json", "txt"], "`validation_file` should be a csv, a json or a txt file."
+        if self.train_file is not None:
+            extension = self.train_file.split(".")[-1]
+            assert extension in ["csv", "json", "txt"], "`train_file` should be a csv, a json or a txt file."
+        if self.validation_file is not None:
+            extension = self.validation_file.split(".")[-1]
+            assert extension in ["csv", "json", "txt"], "`validation_file` should be a csv, a json or a txt file."
 
 
 def data_loader(rng: jax.random.PRNGKey, dataset: Dataset, batch_size: int, shuffle: bool = False):
@@ -186,8 +185,7 @@ def data_loader(rng: jax.random.PRNGKey, dataset: Dataset, batch_size: int, shuf
 
     for idx in batch_idx:
         batch = dataset[idx]
-        batch = {k: jnp.array(v) for k, v in batch.items()}
-        yield batch
+        yield {k: jnp.array(v) for k, v in batch.items()}
 
 
 def write_train_metric(summary_writer, train_metrics, train_time, step):
@@ -215,8 +213,9 @@ def create_learning_rate_fn(
     decay_fn = optax.linear_schedule(
         init_value=learning_rate, end_value=0, transition_steps=num_train_steps - num_warmup_steps
     )
-    schedule_fn = optax.join_schedules(schedules=[warmup_fn, decay_fn], boundaries=[num_warmup_steps])
-    return schedule_fn
+    return optax.join_schedules(
+        schedules=[warmup_fn, decay_fn], boundaries=[num_warmup_steps]
+    )
 
 
 def main():
@@ -348,7 +347,7 @@ def main():
             )
         block_size = min(data_args.block_size, tokenizer.model_max_length)
 
-        
+
     def tokenize_function(examples):
         toks = tokenizer(examples["question"],
                          examples["answer"], 
@@ -459,9 +458,7 @@ def main():
     # TODO: optax returns different state for different optimizers, how can we handle this generically ?
     # or maybe we don't since in our examples we just use adamw or adafactor
     def get_opt_spec(x):
-        if isinstance(x, dict):
-            return param_spec
-        return None
+        return param_spec if isinstance(x, dict) else None
 
     opt_state_spec, param_spec = jax.tree_map(
         get_opt_spec, state_shapes, is_leaf=lambda x: isinstance(x, (dict, optax.EmptyState))

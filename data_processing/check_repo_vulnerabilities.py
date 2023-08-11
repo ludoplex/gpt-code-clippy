@@ -22,15 +22,12 @@ def _run_scorecard(repo):
     # parse results and convert to propert data types
     results = results.split("\n")[1]
     repo, no_vulns, confidence = results.split(",")
-    no_vulns = True if no_vulns == "true" else False
+    no_vulns = no_vulns == "true"
     confidence = int(confidence)
 
     # check results has max confidence.
     # If not return None else return whether it does not have a vulnerability
-    if confidence < 10:
-        return None
-    else:
-        return no_vulns
+    return None if confidence < 10 else no_vulns
 
 
 @call_parse

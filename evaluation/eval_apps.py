@@ -28,13 +28,13 @@ def print_results(results, args):
        per_prob_res.append(np.mean(results[index]))
        all_correct.append(np.all(results[index]))
     tmp_results = res
-    compile_errors = len(tmp_results[tmp_results==-2])
-    runtime_errors = len(tmp_results[tmp_results==-1])
     failures = len(tmp_results[tmp_results==False])
     successes = len(tmp_results[tmp_results==True])
-    total_testcases = len(res)
     if args.debug:
+        compile_errors = len(tmp_results[tmp_results==-2])
+        total_testcases = len(res)
         print(f"number of compile errors = {compile_errors} avg = {compile_errors / total_testcases }")
+        runtime_errors = len(tmp_results[tmp_results==-1])
         print(f"number of runtime errors = {runtime_errors} avg = {runtime_errors / total_testcases}")
         print(f"number of test cases run = {total_testcases}")
 
@@ -51,14 +51,14 @@ def eval_and_save_problems(args):
     gpt_bleu = {}
     gpt_codebleu = {}
     results = {}
-    codes_loc = os.path.join(args.save, f"all_codes.json")
+    codes_loc = os.path.join(args.save, "all_codes.json")
     if not os.path.exists(codes_loc):
         codes_loc = os.path.join(args.save, f"{args.start}-{args.end}_codes.json")
 
     if os.path.exists(codes_loc):
-        results_loc = os.path.join(args.save, f"all_results.json") 
+        results_loc = os.path.join(args.save, "all_results.json")
     else:
-        results_loc = os.path.join(args.save, f"{args.start}-{args.end}_results.json") 
+        results_loc = os.path.join(args.save, f"{args.start}-{args.end}_results.json")
     print(codes_loc, results_loc)
 
     with open(codes_loc, "r") as f: 
@@ -93,7 +93,7 @@ def eval_and_save_problems(args):
 
         with open(os.path.join(prob_path, "solutions.json"), "r") as f:
             sols = json.load(f)
-        
+
         if not os.path.exists(args.save):
             os.makedirs(args.save)
 
@@ -124,9 +124,9 @@ def eval_and_save_problems(args):
         if args.debug:
             print(f"\nHow to read results [-2] = compile error, [-1] = runtime error [False] = failed test case [True] = passed test case")
             #print(f"results = {res}")
- 
+
         results[index+args.start+args.index] = res
-        
+
         with open(results_loc, "w") as f:
             try:
                 f.write(json.dumps(results))
@@ -144,11 +144,11 @@ def main(args):
 
     if args.print_results:
         results = {}
-        codes_loc = os.path.join(args.save, f"all_codes.json")
+        codes_loc = os.path.join(args.save, "all_codes.json")
         if os.path.exists(codes_loc):
-            results_loc = os.path.join(args.save, f"all_results.json") 
+            results_loc = os.path.join(args.save, "all_results.json")
         else:
-            results_loc = os.path.join(args.save, f"{args.start}-{args.end}_results.json") 
+            results_loc = os.path.join(args.save, f"{args.start}-{args.end}_results.json")
         with open(results_loc, "r") as f: 
             results = json.load(f)
     else:

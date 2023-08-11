@@ -86,12 +86,12 @@ def eval_and_save_problems(ds, save):
     gpt_bleu = {}
     gpt_codebleu = {}
     results = {}
-    codes_loc = os.path.join(save, f"all_codes.json")
+    codes_loc = os.path.join(save, "all_codes.json")
     # if not os.path.exists(codes_loc):
     #     codes_loc = os.path.join(args.save, f"{args.start}-{args.end}_codes.json")
 
     if os.path.exists(codes_loc):
-        results_loc = os.path.join(save, f"all_results.json")
+        results_loc = os.path.join(save, "all_results.json")
     print(codes_loc, results_loc)
 
     with open(codes_loc, "r") as f:
@@ -116,7 +116,7 @@ def eval_and_save_problems(ds, save):
             os.makedirs(save)
 
         res = []
-        for o_idx, o in enumerate(output_str):
+        for o in output_str:
             # print(o)
             # if args.debug:
             #     print(f"\nTesting solution {o_idx}")
@@ -143,7 +143,7 @@ def eval_and_save_problems(ds, save):
                 res.append(curr_res)
 
         # if args.debug:
-        
+
         # print(f"results = {res}")
         # print(len(output_str))
         flattened = [val for sublist in res for val in sublist]
